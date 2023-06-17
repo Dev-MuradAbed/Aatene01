@@ -18,10 +18,10 @@ class _HiddenDrawerState extends State<HiddenDrawer> {
   @override
   void initState() {
     items = [
-      ScreenHiddenDrawer(
-          ItemHiddenMenu(
-              name: 'home', baseStyle: TextStyle(), selectedStyle: TextStyle()),
-          HomeScreen())
+      // ScreenHiddenDrawer(
+      //     ItemHiddenMenu(
+      //         name: 'home', baseStyle: TextStyle(), selectedStyle: TextStyle()),
+      //     HomeScreen())
     ];
     super.initState();
   }
@@ -39,6 +39,7 @@ class _HiddenDrawerState extends State<HiddenDrawer> {
       );
     });
     return HiddenDrawerMenu(
+      contentCornerRadius: 25,
       elevationAppBar: 0,
       actionsAppBar: actionIcons,
       screens: items,

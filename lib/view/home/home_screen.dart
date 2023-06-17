@@ -2,9 +2,11 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:diaa_project/provider/product_provider.dart';
 import 'package:diaa_project/view/home/home_widget/story_section_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import '../../models/seller_model.dart';
 import '../../provider/seller_provider.dart';
+import 'drawer_menu_widget.dart';
 import 'home_widget/classification_widget.dart';
 import 'home_widget/container_slider_widget.dart';
 import 'home_widget/declaration_widget.dart';
@@ -18,13 +20,15 @@ import 'package:provider/provider.dart';
 
 // responsive text https://stackoverflow.com/questions/57210428/how-to-create-responsive-text-widget-in-flutter
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  final VoidCallback openDrawer;
+  const HomeScreen({Key? key, required this.openDrawer}) : super(key: key);
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin{
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
   final List<Map<String, dynamic>> itemSlider = [
     {'image': 'assets/image/slider.png'},
     {'image': 'assets/image/slider.png'},
@@ -197,6 +201,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     Provider.of<ProductProvider>(context, listen: false).fetchProduct();
     Provider.of<SellerProvider>(context, listen: false).fetchSellers();
   }
+
   late TabController _tabController;
 
   @override
@@ -210,6 +215,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     _tabController.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     Locale locale = Localizations.localeOf(context);
@@ -217,7 +223,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
     return SafeArea(
       child: Scaffold(
-          extendBody: true,
           body: Align(
             alignment: AlignmentDirectional.centerStart,
             child: SingleChildScrollView(
@@ -271,7 +276,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         spacing: 5,
                         alignment: WrapAlignment.center,
                         children: provider.product
-                            .map((product) => ProductWidget(product: product, format: format,))
+                            .map((product) => ProductWidget(
+                                  product: product,
+                                  format: format,
+                                ))
                             .take(4)
                             .toList(),
                       );
@@ -280,48 +288,88 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   SizedBox(
                     height: 10,
                   ),
-                  ShowMore(showMore: 'المنتجات المميزة', onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) {
-                      return Scaffold(
-                        appBar: AppBar(
-                          backgroundColor: Colors.white,
-                          elevation: 0,
-                          leading: Icon(Icons.arrow_back_ios, color: Colors.black),
-                          title: Column(
-                            children: [
-                              Text("منتجات مميزة",
-                                  style:
-                                  TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Color(0xFF1B1B1B))),
-                              Text("10 تم العثور على عناصر",
-                                  style:
-                                  TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Color(0xFF8D8D8D))),
-                            ],
-                          ),
-                        ),
-                        body:Consumer<ProductProvider>(
-                          builder: (context, provider, _) {
-                            if (provider.product.isEmpty) {
-                              return Text('No product available');
-                            }
-                            return SingleChildScrollView(
-                              child: Wrap(
-                                runSpacing: 0,
-                                spacing: 5,
-                                alignment: WrapAlignment.center,
-                                children: provider.product
-                                    .map((product) => ProductWidget(product: product, format: format,))
-                                    .toList(),
+                  ShowMore(
+                      showMore: 'المنتجات المميزة',
+                      onPressed: () {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) {
+                          print(
+                              'height : ${MediaQuery.of(context).size.height}');
+                          print('width : ${MediaQuery.of(context).size.width}');
+                          return Scaffold(
+                              appBar: AppBar(
+                                backgroundColor: Colors.white,
+                                elevation: 0,
+                                leading: Icon(Icons.arrow_back_ios,
+                                    color: Colors.black),
+                                title: Column(
+                                  children: [
+                                    Text("منتجات مميزة",
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w700,
+                                            color: Color(0xFF1B1B1B))),
+                                    Text("10 تم العثور على عناصر",
+                                        style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w500,
+                                            color: Color(0xFF8D8D8D))),
+                                  ],
+                                ),
                               ),
-                            );
-                          },
-                        ),
-bottomNavigationBar: TabBar(
-  controller: _tabController,
-  tabs: [Icon(Icons.filter_list_outlined),Icon(Icons.cached)],
-),
-                      );
-                    }));
-                  }),
+                              body: Consumer<ProductProvider>(
+                                builder: (context, provider, _) {
+                                  if (provider.product.isEmpty) {
+                                    return Text('No product available');
+                                  }
+                                  return SingleChildScrollView(
+                                    child: Wrap(
+                                      runSpacing: 0,
+                                      spacing: 5,
+                                      alignment: WrapAlignment.center,
+                                      children: provider.product
+                                          .map((product) => ProductWidget(
+                                                product: product,
+                                                format: format,
+                                              ))
+                                          .toList(),
+                                    ),
+                                  );
+                                },
+                              ),
+                              bottomNavigationBar: Container(
+                                height: 75,
+                                padding: EdgeInsets.symmetric(vertical: 10),
+                                color: Colors.white,
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: [
+                                    Container(
+                                        child: Column(
+                                      children: [
+                                        Icon(Icons.filter_list),
+                                        SizedBox(
+                                          height: 5,
+                                        ),
+                                        Text('ترتيب حسب')
+                                      ],
+                                    )),
+                                    Container(
+                                        child: Column(
+                                      children: [
+                                        Icon(Icons.filter_list),
+                                        SizedBox(
+                                          height: 5,
+                                        ),
+                                        Text('فلتر')
+                                      ],
+                                    )),
+                                  ],
+                                ),
+                              ));
+                        }));
+                      }),
 
                   Consumer<ProductProvider>(
                     builder: (context, provider, _) {
@@ -333,7 +381,10 @@ bottomNavigationBar: TabBar(
                         spacing: 5,
                         alignment: WrapAlignment.center,
                         children: provider.product
-                            .map((product) => ProductWidget(product: product, format: format,))
+                            .map((product) => ProductWidget(
+                                  product: product,
+                                  format: format,
+                                ))
                             .take(4)
                             .toList(),
                       );
